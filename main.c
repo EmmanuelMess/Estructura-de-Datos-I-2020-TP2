@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include "arbol_avl.h"
-//#include "tests.h"
+#include "tests.h"
 
 const char PARSE_ERROR[] = "Error: Formato invalido";
 
