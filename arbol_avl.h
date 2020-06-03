@@ -1,6 +1,6 @@
 #ifndef ESTRUCTURA_DE_DATOS_I_2020_TP2_ARBOL_AVL_H
 #define ESTRUCTURA_DE_DATOS_I_2020_TP2_ARBOL_AVL_H
-
+#include <stdbool.h>
 struct Rango {
   double a, b;
 };
