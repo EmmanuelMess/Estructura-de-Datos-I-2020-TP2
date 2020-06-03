@@ -22,9 +22,9 @@ struct ArbolAvl* itree_crear(struct Rango rango);
 
 void itree_destruir(struct ArbolAvl* tree);
 
-struct ArbolAvl*  itree_insertar(struct ArbolAvl *tree, struct Rango rango);
+void  itree_insertar(struct ArbolAvl *tree, struct Rango rango);
 
-struct ArbolAvl*  itree_eliminar(struct ArbolAvl* tree, struct Rango rango);
+void  itree_eliminar(struct ArbolAvl* tree, struct Rango rango);
 
 bool itree_intersectar(struct ArbolAvl* tree, struct Rango rango);
 
