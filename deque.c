@@ -51,7 +51,7 @@ struct ArbolAvlNode* deque_pop_front(struct ArbolAvlNodeDeque *deque) {
 }
 
 void deque_push_front(struct ArbolAvlNodeDeque *deque, struct ArbolAvlNode* arbolAvl) {
-  struct ArbolAvlNodeDequeNode* node = malloc(sizeof(struct ArbolAvlNodeDequeNode));
+  struct ArbolAvlNodeDequeNode* node = calloc(1, sizeof(struct ArbolAvlNodeDequeNode));
   node->arbolAvl = arbolAvl;
   node->siguente = deque->primerNodo;
   node->anterior = NULL;

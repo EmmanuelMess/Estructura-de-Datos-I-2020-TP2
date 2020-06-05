@@ -10,6 +10,7 @@ struct Rango {
 struct ArbolAvlNode {
   struct Rango rango;
   double maxB;
+  short factorDeEquilibrio;
 
   struct ArbolAvlNode* derecha;
   struct ArbolAvlNode* izquierda;
@@ -34,5 +35,7 @@ bool itree_intersectar(struct ArbolAvl* tree, struct Rango rango);
 void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion);
 
 void itree_recorrer_bfs(struct ArbolAvl *arbol, Impresion impresion);
+
+void itree_imprimir_arbol(struct ArbolAvl *arbol);
 
 #endif //ESTRUCTURA_DE_DATOS_I_2020_TP2_ARBOL_AVL_H

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "arbol_avl.h"
 #include "tests.h"
+#define DEBUG true
 
 const char PARSE_ERROR[] = "Error: Formato invalido\n";
 
@@ -146,6 +147,11 @@ int main(int argc, char *argv[]) {
     entrada = fgets(entrada, 1024, stdin);
     if (entrada != NULL) {
       sigue = !procesar(entrada, arbol);
+
+#if DEBUG
+      itree_imprimir_arbol(arbol);
+#endif
+
       free(entrada);
     }
   }

@@ -24,6 +24,53 @@ bool itree_intersectar(struct ArbolAvl *tree, struct Rango rango) {
  return true;
 }
 
+void itree_imprimir_arbol(struct ArbolAvl *arbol) {
+  unsigned int assumedPos = 1;
+  unsigned int nodosEnDeque = 0;
+
+  struct ArbolAvlNodeDeque* deque = deque_crear();
+
+  deque_push_front(deque, arbol->arbolAvlNode);
+  nodosEnDeque++;
+
+  int i = 0;
+  for (; nodosEnDeque > 0; i++) {
+    struct ArbolAvlNode* nodo = deque_pop_back(deque);
+
+    if(!nodo) {
+      printf(" NULL");
+      deque_push_front(deque, NULL);
+      deque_push_front(deque, NULL);
+    } else {
+      printf(
+        " {m: %lf, r: [%lf, %lf], f: %d}",
+        nodo->maxB,
+        nodo->rango.a,
+        nodo->rango.b,
+        nodo->factorDeEquilibrio
+        );
+      nodosEnDeque--;
+
+      deque_push_front(deque, nodo->izquierda);
+      nodosEnDeque += (nodo->izquierda != NULL ? 1 : 0);
+      deque_push_front(deque, nodo->derecha);
+      nodosEnDeque += (nodo->derecha != NULL ? 1 : 0);
+    }
+
+    if(assumedPos == i+1 && nodosEnDeque > 0) {
+      printf("\n");
+      assumedPos <<= 1;
+      assumedPos += 1;
+    }
+  }
+
+  for(;i+1 <= assumedPos; i++) {
+    printf(" NULL");
+  }
+
+  printf("\n");
+}
+
 typedef struct ArbolAvlNode* (Popper(struct ArbolAvlNodeDeque*)) ;
 
 void itree_recorrer_fs(
@@ -47,6 +94,8 @@ void itree_recorrer_fs(
       deque_push_front(deque, nodo->derecha);
     }
   }
+
+  deque_destruir(deque);
 }
 
 void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion) {
