@@ -7,12 +7,16 @@ struct Rango {
   double a, b;
 };
 
-struct ArbolAvl {
+struct ArbolAvlNode {
   struct Rango rango;
   double maxB;
 
-  struct ArbolAvl* derecha;
-  struct ArbolAvl* izquierda;
+  struct ArbolAvlNode* derecha;
+  struct ArbolAvlNode* izquierda;
+};
+
+struct ArbolAvl {
+  struct ArbolAvlNode* arbolAvlNode;
 };
 
 typedef void Impresion(struct Rango);

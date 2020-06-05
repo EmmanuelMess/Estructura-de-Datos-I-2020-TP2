@@ -3,7 +3,7 @@
 #include "deque.h"
 
 struct ArbolAvl *itree_crear() {
-  struct ArbolAvl* avl = malloc(sizeof(struct ArbolAvl));
+  struct ArbolAvl* avl = calloc(1, sizeof(struct ArbolAvl));
 
   return avl;
 }
@@ -24,19 +24,19 @@ bool itree_intersectar(struct ArbolAvl *tree, struct Rango rango) {
  return true;
 }
 
-typedef struct ArbolAvl* (Popper(struct ArbolAvlDeque*)) ;
+typedef struct ArbolAvlNode* (Popper(struct ArbolAvlNodeDeque*)) ;
 
 void itree_recorrer_fs(
   struct ArbolAvl *arbol,
   Impresion impresion,
   Popper pop
 ) {
-  struct ArbolAvlDeque* deque = deque_crear();
+  struct ArbolAvlNodeDeque* deque = deque_crear();
 
-  deque_push_front(deque, arbol);
+  deque_push_front(deque, arbol->arbolAvlNode);
 
   while (!deque_vacio(deque)) {
-    struct ArbolAvl* nodo = pop(deque);
+    struct ArbolAvlNode* nodo = pop(deque);
 
     impresion(nodo->rango);
 

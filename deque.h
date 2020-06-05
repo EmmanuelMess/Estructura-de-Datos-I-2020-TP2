@@ -5,27 +5,27 @@
 #include "arbol_avl.h"
 
 //INICIO <-> <-> <-> FINAL
-struct ArbolAvlDequeNode {
-  struct ArbolAvl* arbolAvl;
-  struct ArbolAvlDequeNode* siguente;
-  struct ArbolAvlDequeNode* anterior;
+struct ArbolAvlNodeDequeNode {
+  struct ArbolAvlNode* arbolAvl;
+  struct ArbolAvlNodeDequeNode* siguente;
+  struct ArbolAvlNodeDequeNode* anterior;
 };
 
-struct ArbolAvlDeque {
-  struct ArbolAvlDequeNode* primerNodo;
-  struct ArbolAvlDequeNode* ultimoNodo;
+struct ArbolAvlNodeDeque {
+  struct ArbolAvlNodeDequeNode* primerNodo;
+  struct ArbolAvlNodeDequeNode* ultimoNodo;
 };
 
-struct ArbolAvlDeque* deque_crear();
+struct ArbolAvlNodeDeque* deque_crear();
 
-void deque_destruir(struct ArbolAvlDeque* deque);
+void deque_destruir(struct ArbolAvlNodeDeque* deque);
 
-bool deque_vacio(struct ArbolAvlDeque *deque);
+bool deque_vacio(struct ArbolAvlNodeDeque *deque);
 
-void deque_push_front(struct ArbolAvlDeque* deque, struct ArbolAvl* arbolAvl);
+void deque_push_front(struct ArbolAvlNodeDeque* deque, struct ArbolAvlNode* arbolAvl);
 
-struct ArbolAvl* deque_pop_front(struct ArbolAvlDeque* deque);
+struct ArbolAvlNode* deque_pop_front(struct ArbolAvlNodeDeque* deque);
 
-struct ArbolAvl* deque_pop_back(struct ArbolAvlDeque* deque);
+struct ArbolAvlNode* deque_pop_back(struct ArbolAvlNodeDeque* deque);
 
 #endif //ESTRUCTURA_DE_DATOS_I_2020_TP2_DEQUE_H
