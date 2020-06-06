@@ -26,7 +26,7 @@ struct ArbolAvl* itree_crear();
 
 void itree_destruir(struct ArbolAvl* tree);
 
-void itree_insertar(struct ArbolAvl *tree, struct Rango rango);
+bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango);
 
 void itree_eliminar(struct ArbolAvl* tree, struct Rango rango);
 
