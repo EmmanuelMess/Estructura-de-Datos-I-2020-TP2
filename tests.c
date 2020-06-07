@@ -5,7 +5,7 @@
 #include "deque.h"
 
 void test_deque_pila() {
-  struct ArbolAvlNodeDeque* deque = deque_crear();
+  struct Deque* deque = deque_crear();
 
   deque_push_front(deque, (struct ArbolAvlNode*) 1);
   deque_push_front(deque, (struct ArbolAvlNode*) 2);
@@ -25,7 +25,7 @@ void test_deque_pila() {
 }
 
 void test_deque_cola() {
-  struct ArbolAvlNodeDeque* deque = deque_crear();
+  struct Deque* deque = deque_crear();
 
   deque_push_front(deque, (struct ArbolAvlNode*) 1);
   deque_push_front(deque, (struct ArbolAvlNode*) 2);

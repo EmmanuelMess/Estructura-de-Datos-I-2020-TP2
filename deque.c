@@ -1,12 +1,12 @@
 #include "deque.h"
 
-struct ArbolAvlNodeDeque *deque_crear() {
-  return calloc(1, sizeof(struct ArbolAvlNodeDeque));
+struct Deque *deque_crear() {
+  return calloc(1, sizeof(struct Deque));
 }
 
-void deque_destruir(struct ArbolAvlNodeDeque *deque) {
+void deque_destruir(struct Deque *deque) {
   while (deque->primerNodo != NULL) {
-    struct ArbolAvlNodeDequeNode* siguente = deque->primerNodo->siguente;
+    struct DequeNode* siguente = deque->primerNodo->siguente;
     free(deque->primerNodo);
     deque->primerNodo = siguente;
   }
@@ -14,12 +14,12 @@ void deque_destruir(struct ArbolAvlNodeDeque *deque) {
   free(deque);
 }
 
-bool deque_vacio(struct ArbolAvlNodeDeque *deque) {
+bool deque_vacio(struct Deque *deque) {
   return deque->ultimoNodo == NULL;
 }
 
-struct ArbolAvlNode* deque_pop_back(struct ArbolAvlNodeDeque *deque) {
-  struct ArbolAvlNodeDequeNode* tmp = deque->ultimoNodo;
+void * deque_pop_back(struct Deque *deque) {
+  struct DequeNode* tmp = deque->ultimoNodo;
 
   struct ArbolAvlNode* elemento = deque->ultimoNodo->arbolAvl;
   deque->ultimoNodo = deque->ultimoNodo->anterior;
@@ -34,8 +34,8 @@ struct ArbolAvlNode* deque_pop_back(struct ArbolAvlNodeDeque *deque) {
   return elemento;
 }
 
-struct ArbolAvlNode* deque_pop_front(struct ArbolAvlNodeDeque *deque) {
-  struct ArbolAvlNodeDequeNode* tmp = deque->primerNodo;
+void * deque_pop_front(struct Deque *deque) {
+  struct DequeNode* tmp = deque->primerNodo;
 
   struct ArbolAvlNode* elemento = deque->primerNodo->arbolAvl;
   deque->primerNodo = deque->primerNodo->siguente;
@@ -50,9 +50,9 @@ struct ArbolAvlNode* deque_pop_front(struct ArbolAvlNodeDeque *deque) {
   return elemento;
 }
 
-void deque_push_front(struct ArbolAvlNodeDeque *deque, struct ArbolAvlNode* arbolAvl) {
-  struct ArbolAvlNodeDequeNode* node = calloc(1, sizeof(struct ArbolAvlNodeDequeNode));
-  node->arbolAvl = arbolAvl;
+void deque_push_front(struct Deque *deque, void *elemento) {
+  struct DequeNode* node = calloc(1, sizeof(struct DequeNode));
+  node->arbolAvl = elemento;
   node->siguente = deque->primerNodo;
   node->anterior = NULL;
 

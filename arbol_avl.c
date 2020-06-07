@@ -3,14 +3,14 @@
 #include "arbol_avl.h"
 #include "deque.h"
 
-typedef struct ArbolAvlNode* (Popper(struct ArbolAvlNodeDeque*)) ;
+typedef struct ArbolAvlNode* (Popper(struct Deque*)) ;
 
 void itree_recorrer_fs(
   struct ArbolAvl *arbol,
   Accion actuar,
   Popper pop
 ) {
-  struct ArbolAvlNodeDeque* deque = deque_crear();
+  struct Deque* deque = deque_crear();
 
   deque_push_front(deque, arbol->arbolAvlNode);
 
@@ -45,10 +45,8 @@ void itree_eliminar(struct ArbolAvl *tree, struct Rango rango) {
 
 }
 
-enum {
-  IZQUIERDA = 0,
-  DERECHA = 1
-};
+int IZQUIERDA = 0;
+int DERECHA = 1;
 
 void actualizar_max_nodo(struct ArbolAvlNode* nodo) {
   if(nodo->izquierda == NULL && nodo->derecha == NULL) {
@@ -106,8 +104,8 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
   nodo->rango = rango;
   nodo->maxB = rango.b;
 
-  struct ArbolAvlNodeDeque* deque = deque_crear();
-  struct ArbolAvlNodeDeque* dequeInfo = deque_crear();
+  struct Deque* dequeCamino = deque_crear();
+  struct Deque* dequeDireccion = deque_crear();
 
   {
     struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
@@ -118,26 +116,26 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
           || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
         pos = &((*pos)->izquierda);
         chequear->factorDeEquilibrio--;
-        deque_push_front(dequeInfo, IZQUIERDA);
+        deque_push_front(dequeDireccion, &IZQUIERDA);
       } else if (chequear->rango.a < rango.a
                  || (chequear->rango.a == rango.a &&
                      chequear->rango.b < rango.b)) {
         pos = &((*pos)->derecha);
         chequear->factorDeEquilibrio++;
-        deque_push_front(dequeInfo, DERECHA);
+        deque_push_front(dequeDireccion, &DERECHA);
       } else {
         return false;
       }
 
-      deque_push_front(deque, chequear);
+      deque_push_front(dequeCamino, chequear);
     }
 
     *pos = nodo;
   }
 
-  while (!deque_vacio(deque)) {
-    struct ArbolAvlNode* chequear = deque_pop_front(deque);
-    int pos = deque_pop_front(dequeInfo);
+  while (!deque_vacio(dequeCamino)) {
+    struct ArbolAvlNode* chequear = deque_pop_front(dequeCamino);
+    int pos = *((int*) deque_pop_front(dequeDireccion));
 
     actualizar_max_nodo(chequear);
 
@@ -151,9 +149,9 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
 
     struct ArbolAvlNode **posicionDelNodo;
 
-    if (!deque_vacio(dequeInfo)) {
-      struct ArbolAvlNode *padre = deque_pop_front(deque);
-      deque_push_front(deque, padre);
+    if (!deque_vacio(dequeDireccion)) {
+      struct ArbolAvlNode *padre = deque_pop_front(dequeCamino);
+      deque_push_front(dequeCamino, padre);
 
       if (pos == IZQUIERDA) {
         posicionDelNodo = &(padre->izquierda);
@@ -177,13 +175,13 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
     }
   }
 
-  while (!deque_vacio(deque)) {
-    struct ArbolAvlNode *chequear = deque_pop_front(deque);
+  while (!deque_vacio(dequeCamino)) {
+    struct ArbolAvlNode *chequear = deque_pop_front(dequeCamino);
     actualizar_max_nodo(chequear);
   }
 
-  deque_destruir(deque);
-  deque_destruir(dequeInfo);
+  deque_destruir(dequeCamino);
+  deque_destruir(dequeDireccion);
 
   return true;
 }
@@ -196,7 +194,7 @@ void itree_imprimir_arbol(struct ArbolAvl *arbol) {
   unsigned int assumedPos = 1;
   unsigned int nodosEnDeque = 0;
 
-  struct ArbolAvlNodeDeque* deque = deque_crear();
+  struct Deque* deque = deque_crear();
 
   deque_push_front(deque, arbol->arbolAvlNode);
   nodosEnDeque++;
