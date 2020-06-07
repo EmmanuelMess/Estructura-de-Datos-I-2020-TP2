@@ -54,6 +54,7 @@ void test_procesador() {
   }
 
   itree_destruir(arbol);
+  fclose(file);
 }
 
 void main_tests() {
