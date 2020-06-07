@@ -178,12 +178,12 @@ void itree_imprimir_arbol(struct ArbolAvl *arbol) {
     struct ArbolAvlNode* nodo = deque_pop_back(deque);
 
     if(!nodo) {
-      printf(" NULL");
+      printf(" {    NULL    }");
       deque_push_front(deque, NULL);
       deque_push_front(deque, NULL);
     } else {
       printf(
-        " {m: %lf, r: [%lf, %lf], f: %d}",
+        " {m: %.1lf, r: [%.2lf, %.2lf], f: %d}",
         nodo->maxB,
         nodo->rango.a,
         nodo->rango.b,
@@ -205,7 +205,7 @@ void itree_imprimir_arbol(struct ArbolAvl *arbol) {
   }
 
   for(;i+1 <= assumedPos; i++) {
-    printf(" NULL");
+    printf(" {    NULL    }");
   }
 
   printf("\n");
