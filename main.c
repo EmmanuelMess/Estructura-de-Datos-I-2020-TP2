@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "arbol_avl.h"
 #include "tests.h"
+#include "main.h"
 #define DEBUG true
 
 const char PARSE_ERROR[] = "Error: Formato invalido\n";
+const char ERROR_RANGO[] = "Error: Rango invalido\n";
+const char ERROR_INSERCION[] = "Error: Insercion invalida\n";
 
-void impresion(struct Rango rango) {
-  printf(" [%lf, %lf]", rango.a, rango.b);
+void impresion(struct ArbolAvlNode* nodo) {
+  printf(" [%lf, %lf]", nodo->rango.a, nodo->rango.b);
 }
 
 bool escanearRango(struct Rango* rango, char* entrada) {
@@ -40,7 +42,7 @@ bool escanearRango(struct Rango* rango, char* entrada) {
   return false;
 }
 
-bool procesar(char* entrada, struct ArbolAvl* arbol) {
+bool procesar(char *entrada, struct ArbolAvl *arbol) {
   char c;
   if(sscanf(entrada, "%c", &c) == 1) {
     entrada++;
@@ -64,7 +66,17 @@ bool procesar(char* entrada, struct ArbolAvl* arbol) {
         return false;
       }
 
-      itree_insertar(arbol, rango);
+      if(rango.b < rango.a) {
+        printf(ERROR_RANGO);
+        return false;
+      }
+
+      bool fallo = !itree_insertar(arbol, rango);
+
+      if(fallo) {
+        printf(ERROR_INSERCION);
+        return false;
+      }
     }
       break;
     case 'e':{
@@ -132,11 +144,13 @@ bool procesar(char* entrada, struct ArbolAvl* arbol) {
 }
 
 int main(int argc, char *argv[]) {
+#if DEBUG
   if(argc == 2) {
     main_tests();
 
     return 0;
   }
+#endif
 
   struct ArbolAvl* arbol = itree_crear();
   bool sigue = true;
@@ -155,4 +169,6 @@ int main(int argc, char *argv[]) {
       free(entrada);
     }
   }
+
+  itree_destruir(arbol);
 }

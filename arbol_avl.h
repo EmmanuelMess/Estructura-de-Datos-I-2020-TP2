@@ -20,7 +20,9 @@ struct ArbolAvl {
   struct ArbolAvlNode* arbolAvlNode;
 };
 
-typedef void Impresion(struct Rango);
+typedef void Accion(struct ArbolAvlNode*);
+
+typedef void Impresion(struct ArbolAvlNode*);
 
 struct ArbolAvl* itree_crear();
 

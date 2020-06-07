@@ -3,6 +3,33 @@
 #include "arbol_avl.h"
 #include "deque.h"
 
+typedef struct ArbolAvlNode* (Popper(struct ArbolAvlNodeDeque*)) ;
+
+void itree_recorrer_fs(
+  struct ArbolAvl *arbol,
+  Accion actuar,
+  Popper pop
+) {
+  struct ArbolAvlNodeDeque* deque = deque_crear();
+
+  deque_push_front(deque, arbol->arbolAvlNode);
+
+  while (!deque_vacio(deque)) {
+    struct ArbolAvlNode* nodo = pop(deque);
+
+    if(nodo->izquierda) {
+      deque_push_front(deque, nodo->izquierda);
+    }
+    if(nodo->derecha) {
+      deque_push_front(deque, nodo->derecha);
+    }
+
+    actuar(nodo);
+  }
+
+  deque_destruir(deque);
+}
+
 struct ArbolAvl *itree_crear() {
   struct ArbolAvl* avl = calloc(1, sizeof(struct ArbolAvl));
 
@@ -10,6 +37,7 @@ struct ArbolAvl *itree_crear() {
 }
 
 void itree_destruir(struct ArbolAvl *tree) {
+  itree_recorrer_fs(tree, free, deque_pop_back);
   free(tree);
 }
 
@@ -211,37 +239,18 @@ void itree_imprimir_arbol(struct ArbolAvl *arbol) {
   printf("\n");
 }
 
-typedef struct ArbolAvlNode* (Popper(struct ArbolAvlNodeDeque*)) ;
-
-void itree_recorrer_fs(
+void itree_recorrer_fs_imprimir(
   struct ArbolAvl *arbol,
   Impresion impresion,
   Popper pop
 ) {
-  struct ArbolAvlNodeDeque* deque = deque_crear();
-
-  deque_push_front(deque, arbol->arbolAvlNode);
-
-  while (!deque_vacio(deque)) {
-    struct ArbolAvlNode* nodo = pop(deque);
-
-    impresion(nodo->rango);
-
-    if(nodo->izquierda) {
-      deque_push_front(deque, nodo->izquierda);
-    }
-    if(nodo->derecha) {
-      deque_push_front(deque, nodo->derecha);
-    }
-  }
-
-  deque_destruir(deque);
+  itree_recorrer_fs(arbol, impresion, pop);
 }
 
 void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion) {
-  itree_recorrer_fs(arbol, impresion, deque_pop_front);
+  itree_recorrer_fs_imprimir(arbol, impresion, deque_pop_front);
 }
 
 void itree_recorrer_bfs(struct ArbolAvl *arbol, Impresion impresion) {
-  itree_recorrer_fs(arbol, impresion, deque_pop_back);
+  itree_recorrer_fs_imprimir(arbol, impresion, deque_pop_back);
 }

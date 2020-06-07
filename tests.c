@@ -1,5 +1,7 @@
 #include <assert.h>
 #include "tests.h"
+#include "main.h"
+#include "arbol_avl.h"
 #include "deque.h"
 
 void test_deque_pila() {
@@ -42,7 +44,20 @@ void test_deque_cola() {
   deque_destruir(deque);
 }
 
+void test_procesador() {
+  FILE* file = fopen("tests/simple.txt", "r");
+  char buffer[256];
+  struct ArbolAvl* arbol = itree_crear();
+
+  while(fgets(buffer, 256, file)) {
+    procesar(buffer, arbol);
+  }
+
+  itree_destruir(arbol);
+}
+
 void main_tests() {
   test_deque_pila();
   test_deque_cola();
+  test_procesador();
 }
