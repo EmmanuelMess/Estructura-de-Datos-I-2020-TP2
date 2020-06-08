@@ -50,6 +50,10 @@ void * deque_pop_front(struct Deque *deque) {
   return elemento;
 }
 
+void * deque_peek_front(struct Deque *deque) {
+  return deque->primerNodo->arbolAvl;
+}
+
 void deque_push_front(struct Deque *deque, void *elemento) {
   struct DequeNode* node = calloc(1, sizeof(struct DequeNode));
   node->arbolAvl = elemento;

@@ -8,6 +8,7 @@
 const char PARSE_ERROR[] = "Error: Formato invalido\n";
 const char ERROR_RANGO[] = "Error: Rango invalido\n";
 const char ERROR_INSERCION[] = "Error: Insercion invalida\n";
+const char ERROR_ELIMINACION[] = "Error: Eliminacion invalida\n";
 
 void impresion(struct ArbolAvlNode* nodo) {
   printf(" [%lf, %lf]", nodo->rango.a, nodo->rango.b);
@@ -93,7 +94,10 @@ bool procesar(char *entrada, struct ArbolAvl *arbol) {
         return false;
       }
 
-      itree_eliminar(arbol, rango);
+      bool fallo = !itree_eliminar(arbol, rango);
+      if(fallo) {
+        printf(ERROR_ELIMINACION);
+      }
     }
       break;
     case '?':{

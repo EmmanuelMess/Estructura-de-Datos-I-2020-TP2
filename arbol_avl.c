@@ -5,6 +5,10 @@
 
 typedef struct ArbolAvlNode* (Popper(struct Deque*)) ;
 
+int max(int a, int b) {
+  return a > b? a:b;
+}
+
 void itree_recorrer_fs(
   struct ArbolAvl *arbol,
   Accion actuar,
@@ -41,7 +45,7 @@ void itree_destruir(struct ArbolAvl *tree) {
   free(tree);
 }
 
-void itree_eliminar(struct ArbolAvl *tree, struct Rango rango) {
+bool itree_eliminar(struct ArbolAvl *tree, struct Rango rango) {
 
 }
 
@@ -115,13 +119,11 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
       if (rango.a < chequear->rango.a
           || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
         pos = &((*pos)->izquierda);
-        chequear->factorDeEquilibrio--;
         deque_push_front(dequeDireccion, &IZQUIERDA);
       } else if (chequear->rango.a < rango.a
                  || (chequear->rango.a == rango.a &&
                      chequear->rango.b < rango.b)) {
         pos = &((*pos)->derecha);
-        chequear->factorDeEquilibrio++;
         deque_push_front(dequeDireccion, &DERECHA);
       } else {
         return false;
@@ -139,8 +141,10 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
 
     actualizar_max_nodo(chequear);
 
-    if(chequear->factorDeEquilibrio == 0) {
-      break;
+    if(pos == IZQUIERDA) {
+      chequear->factorDeEquilibrio--;
+    } else {
+      chequear->factorDeEquilibrio++;
     }
 
     if(-1 <= chequear->factorDeEquilibrio && chequear->factorDeEquilibrio <= 1) {
@@ -164,14 +168,18 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
 
     if (chequear->izquierda->factorDeEquilibrio < 0) {
       rotacion_simple_izquierda(posicionDelNodo, chequear);
+      break;
     } else if (chequear->derecha->factorDeEquilibrio > 0) {
       rotacion_simple_derecha(posicionDelNodo, chequear);
+      break;
     } else if(chequear->izquierda->factorDeEquilibrio > 0) {
       rotacion_simple_derecha(&(chequear->izquierda), chequear->izquierda);
       rotacion_simple_izquierda(posicionDelNodo, chequear);
+      break;
     } else if(chequear->derecha->factorDeEquilibrio < 0) {
       rotacion_simple_izquierda(&(chequear->derecha), chequear->derecha);
       rotacion_simple_derecha(posicionDelNodo, chequear);
+      break;
     }
   }
 

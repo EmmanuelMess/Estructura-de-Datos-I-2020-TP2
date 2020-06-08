@@ -24,6 +24,8 @@ bool deque_vacio(struct Deque *deque);
 
 void deque_push_front(struct Deque* deque, void *elemento);
 
+void * deque_peek_front(struct Deque *deque);
+
 void * deque_pop_front(struct Deque* deque);
 
 void * deque_pop_back(struct Deque* deque);
