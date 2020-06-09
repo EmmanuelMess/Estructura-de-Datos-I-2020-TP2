@@ -14,6 +14,10 @@ void itree_recorrer_fs(
   Accion actuar,
   Popper pop
 ) {
+  if(arbol->arbolAvlNode == NULL) {
+    return;
+  }
+
   struct Deque* deque = deque_crear();
 
   deque_push_front(deque, arbol->arbolAvlNode);
