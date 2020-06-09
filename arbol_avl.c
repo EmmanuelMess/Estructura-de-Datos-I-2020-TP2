@@ -1,7 +1,12 @@
 #include <malloc.h>
 #include <stdlib.h>
+#include <math.h>
 #include "arbol_avl.h"
 #include "deque.h"
+
+bool inexistente(struct Rango rango) {
+  return isnan(rango.a);
+}
 
 typedef struct ArbolAvlNode* (Popper(struct Deque*)) ;
 
@@ -225,7 +230,6 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
   {
     if (nodoAEliminar->izquierda != NULL && nodoAEliminar->derecha != NULL) {
       struct ArbolAvlNode **posicionDelNodoSacado;
-
       struct ArbolAvlNode *nuevoHijo;
 
       nuevoHijo = nodoAEliminar->derecha;
@@ -248,7 +252,6 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
       nuevoHijo->derecha = nodoAEliminar->derecha;
 
       *posicionDelNodoAEliminar = nuevoHijo;
-
     } else if (nodoAEliminar->izquierda != NULL) {
       *posicionDelNodoAEliminar = nodoAEliminar->izquierda;
       if (!deque_vacio(dequeDireccion)) {

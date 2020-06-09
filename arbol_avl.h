@@ -7,7 +7,9 @@ struct Rango {
   double a, b;
 };
 
-#define RANGO_INEXISTENTE ((struct Rango) {.a = 0./0, .b = 0./0});
+#define RANGO_INEXISTENTE ((struct Rango) {.a = NAN, .b = NAN});
+
+bool inexistente(struct Rango rango);
 
 struct ArbolAvlNode {
   struct Rango rango;

@@ -115,7 +115,7 @@ bool procesar(char *entrada, struct ArbolAvl *arbol) {
       }
 
       struct Rango intersecta = itree_intersectar(arbol, rango);
-      if(intersecta.a != intersecta.a) {
+      if(inexistente(intersecta)) {
         printf("No\n");
       } else {
         printf("Si [%lf, %lf]\n", intersecta.a, intersecta.b);
