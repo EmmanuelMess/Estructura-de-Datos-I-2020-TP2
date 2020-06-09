@@ -374,8 +374,38 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
   return true;
 }
 
-bool itree_intersectar(struct ArbolAvl *tree, struct Rango rango) {
- return true;
+bool existeInterseccion(struct Rango uno, struct Rango dos) {
+  return (uno.b >= dos.a && dos.b >= uno.a);
+}
+
+struct Rango itree_intersectar(struct ArbolAvl *tree, struct Rango rango) {
+  struct ArbolAvlNode* nodo = tree->arbolAvlNode;
+
+  while (nodo != NULL) {
+    if(existeInterseccion(nodo->rango, rango)) {
+      return nodo->rango;
+    }
+
+    if(nodo->maxB < rango.a) {
+      return RANGO_INEXISTENTE;
+    }
+
+    if(rango.a <= nodo->rango.a) {
+      if (nodo->izquierda && rango.a <= nodo->izquierda->maxB) {
+        nodo = nodo->izquierda;
+      } else {
+        return RANGO_INEXISTENTE;
+      }
+    } else {
+      if (nodo->derecha && rango.a <= nodo->derecha->maxB) {
+        nodo = nodo->derecha;
+      } else {
+        return RANGO_INEXISTENTE;
+      }
+    }
+  }
+
+  return RANGO_INEXISTENTE;
 }
 
 void itree_imprimir_arbol(struct ArbolAvl *arbol) {

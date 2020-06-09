@@ -7,6 +7,8 @@ struct Rango {
   double a, b;
 };
 
+#define RANGO_INEXISTENTE ((struct Rango) {.a = 0./0, .b = 0./0});
+
 struct ArbolAvlNode {
   struct Rango rango;
   double maxB;
@@ -32,7 +34,7 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango);
 
 bool itree_eliminar(struct ArbolAvl* arbol, struct Rango rango);
 
-bool itree_intersectar(struct ArbolAvl* tree, struct Rango rango);
+struct Rango itree_intersectar(struct ArbolAvl* tree, struct Rango rango);
 
 void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion);
 
