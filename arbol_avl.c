@@ -45,10 +45,6 @@ void itree_destruir(struct ArbolAvl *tree) {
   free(tree);
 }
 
-bool itree_eliminar(struct ArbolAvl *tree, struct Rango rango) {
-
-}
-
 int IZQUIERDA = 0;
 int DERECHA = 1;
 
@@ -198,11 +194,196 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
   return true;
 }
 
+struct ArbolAvlNode** obenerPosicion(
+  struct Deque* dequeCamino,
+  int direccion,
+  struct ArbolAvl* arbol
+) {
+  struct ArbolAvlNode **posicionDelNodoSacado;
+
+  if (!deque_vacio(dequeCamino)) {
+    struct ArbolAvlNode *padre = deque_peek_front(dequeCamino);
+
+    if (direccion == IZQUIERDA) {
+      posicionDelNodoSacado = &(padre->izquierda);
+    } else {
+      posicionDelNodoSacado = &(padre->derecha);
+    }
+  } else {
+    posicionDelNodoSacado = &(arbol->arbolAvlNode);
+  }
+
+  return posicionDelNodoSacado;
+}
+
+struct ArbolAvlNode** obenerPosicionDeque(
+  struct Deque* dequeCamino,
+  struct Deque* dequeDireccion,
+  struct ArbolAvl* arbol
+) {
+  if (!deque_vacio(dequeDireccion)) {
+    return obenerPosicion(
+      dequeCamino,
+      *(int *) deque_peek_front(dequeDireccion),
+      arbol
+    );
+  } else {
+    return &(arbol->arbolAvlNode);
+  }
+}
+
+bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
+  struct Deque* dequeCamino = deque_crear();
+  struct Deque* dequeDireccion = deque_crear();
+
+  struct ArbolAvlNode **posicionDelNodoAEliminar;
+
+    {
+    struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
+    while (*pos != NULL) {
+      struct ArbolAvlNode* chequear = *pos;
+
+      if (rango.a < chequear->rango.a
+          || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
+        pos = &((*pos)->izquierda);
+        deque_push_front(dequeDireccion, &IZQUIERDA);
+      } else if (chequear->rango.a < rango.a
+                 || (chequear->rango.a == rango.a && chequear->rango.b < rango.b)) {
+        pos = &((*pos)->derecha);
+        deque_push_front(dequeDireccion, &DERECHA);
+      } else if(rango.a == (*pos)->rango.a && rango.b == (*pos)->rango.b) {
+        *pos = NULL;
+        posicionDelNodoAEliminar = pos;
+      } else {
+        return false;
+      }
+
+      deque_push_front(dequeCamino, chequear);
+    }
+  }
+
+  {
+    struct ArbolAvlNode *nodoAEliminar = deque_pop_front(dequeCamino);
+
+    if (nodoAEliminar->izquierda != NULL && nodoAEliminar->derecha != NULL) {
+      struct Deque* dequeCaminoTemporal = deque_crear();
+
+      struct ArbolAvlNode **posicionDelNodoSacado;
+
+      struct ArbolAvlNode *nuevoHijo;
+
+      nuevoHijo = nodoAEliminar->derecha;
+      posicionDelNodoSacado = &(nodoAEliminar->derecha);
+
+      deque_push_front(dequeCaminoTemporal, nuevoHijo);
+      deque_push_front(dequeDireccion, &DERECHA);
+
+      while(nuevoHijo->izquierda != NULL) {
+        nuevoHijo = nuevoHijo->izquierda;
+        posicionDelNodoSacado = &(nodoAEliminar->derecha);
+
+        deque_push_front(dequeCaminoTemporal, nuevoHijo);
+        deque_push_front(dequeDireccion, &IZQUIERDA);
+      }
+
+      *posicionDelNodoSacado = NULL;
+
+      deque_pop_front(dequeDireccion);
+
+      nuevoHijo->izquierda = nodoAEliminar->izquierda;
+      nuevoHijo->derecha = nodoAEliminar->derecha;
+
+      *posicionDelNodoAEliminar = nuevoHijo;
+      deque_push_front(dequeCamino, nuevoHijo);
+
+      while(!deque_vacio(dequeCaminoTemporal)) {
+        deque_push_front(dequeCamino, deque_pop_back(dequeCaminoTemporal));
+      }
+
+      deque_destruir(dequeCaminoTemporal);
+    } else if (nodoAEliminar->izquierda != NULL) {
+      *posicionDelNodoAEliminar = nodoAEliminar->izquierda;
+      if (!deque_vacio(dequeDireccion)) {
+        deque_pop_front(dequeDireccion);
+      }
+    } else if (nodoAEliminar->derecha != NULL) {
+      *posicionDelNodoAEliminar = nodoAEliminar->derecha;
+      if (!deque_vacio(dequeDireccion)) {
+        deque_pop_front(dequeDireccion);
+      }
+    } else {
+      *posicionDelNodoAEliminar = NULL;
+      if (!deque_vacio(dequeDireccion)) {
+        deque_pop_front(dequeDireccion);
+      }
+    }
+
+    free(nodoAEliminar);
+  }
+
+  while (!deque_vacio(dequeCamino)) {
+    struct ArbolAvlNode* chequear = deque_pop_front(dequeCamino);
+
+    actualizar_max_nodo(chequear);
+
+    if(chequear->izquierda && chequear->derecha) {
+      chequear->alto = max(chequear->izquierda->alto, chequear->derecha->alto) + 1;
+    } else if(chequear->izquierda) {
+      chequear->alto = chequear->izquierda->alto + 1;
+    } else if(chequear->derecha) {
+      chequear->alto = chequear->derecha->alto + 1;
+    } else {
+      chequear->alto = 1;
+    }
+
+    if(-1 <= itree_factor_de_equilibrio(chequear)
+       && itree_factor_de_equilibrio(chequear) <= 1) {
+      continue;
+    }
+
+    struct ArbolAvlNode **posicionDelNodo = obenerPosicionDeque(dequeCamino, dequeDireccion, arbol);
+    if(!deque_vacio(dequeDireccion)) {
+      deque_pop_front(dequeDireccion);
+    }
+
+    if (itree_factor_de_equilibrio(chequear->izquierda) < 0) {
+      rotacion_simple_izquierda(posicionDelNodo, chequear);
+      break;
+    } else if (itree_factor_de_equilibrio(chequear->derecha) > 0) {
+      rotacion_simple_derecha(posicionDelNodo, chequear);
+      break;
+    } else if(itree_factor_de_equilibrio(chequear->izquierda) > 0) {
+      rotacion_simple_derecha(&(chequear->izquierda), chequear->izquierda);
+      rotacion_simple_izquierda(posicionDelNodo, chequear);
+      break;
+    } else if(itree_factor_de_equilibrio(chequear->derecha) < 0) {
+      rotacion_simple_izquierda(&(chequear->derecha), chequear->derecha);
+      rotacion_simple_derecha(posicionDelNodo, chequear);
+      break;
+    }
+  }
+
+  while (!deque_vacio(dequeCamino)) {
+    struct ArbolAvlNode *chequear = deque_pop_front(dequeCamino);
+    actualizar_max_nodo(chequear);
+  }
+
+  deque_destruir(dequeCamino);
+  deque_destruir(dequeDireccion);
+
+  return true;
+}
+
 bool itree_intersectar(struct ArbolAvl *tree, struct Rango rango) {
  return true;
 }
 
 void itree_imprimir_arbol(struct ArbolAvl *arbol) {
+  if(arbol->arbolAvlNode == NULL) {
+    printf("Vacio\n");
+    return;
+  }
+
   unsigned int assumedPos = 1;
   unsigned int nodosEnDeque = 0;
 

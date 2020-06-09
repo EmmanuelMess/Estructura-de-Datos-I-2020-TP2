@@ -30,7 +30,7 @@ void itree_destruir(struct ArbolAvl* tree);
 
 bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango);
 
-bool itree_eliminar(struct ArbolAvl* tree, struct Rango rango);
+bool itree_eliminar(struct ArbolAvl* arbol, struct Rango rango);
 
 bool itree_intersectar(struct ArbolAvl* tree, struct Rango rango);
 
