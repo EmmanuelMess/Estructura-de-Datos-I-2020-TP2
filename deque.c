@@ -69,3 +69,15 @@ void deque_push_front(struct Deque *deque, void *elemento) {
     deque->primerNodo = node;
   }
 }
+
+int deque_largo(struct Deque *deque) {
+  if(deque->primerNodo == NULL) {
+    return 0;
+  }
+
+  int resultado = 1;
+  for(struct DequeNode* inicio = deque->primerNodo; inicio != deque->ultimoNodo; inicio = inicio->siguente) {
+    resultado++;
+  }
+  return resultado;
+}

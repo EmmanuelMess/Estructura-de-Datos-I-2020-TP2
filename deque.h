@@ -30,4 +30,6 @@ void * deque_pop_front(struct Deque* deque);
 
 void * deque_pop_back(struct Deque* deque);
 
+int deque_largo(struct Deque *deque);
+
 #endif //ESTRUCTURA_DE_DATOS_I_2020_TP2_DEQUE_H
