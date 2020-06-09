@@ -10,7 +10,7 @@ struct Rango {
 struct ArbolAvlNode {
   struct Rango rango;
   double maxB;
-  short factorDeEquilibrio;
+  int alto;
 
   struct ArbolAvlNode* derecha;
   struct ArbolAvlNode* izquierda;
@@ -39,5 +39,7 @@ void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion);
 void itree_recorrer_bfs(struct ArbolAvl *arbol, Impresion impresion);
 
 void itree_imprimir_arbol(struct ArbolAvl *arbol);
+
+int itree_factor_de_equilibrio(struct ArbolAvlNode *nodo);
 
 #endif //ESTRUCTURA_DE_DATOS_I_2020_TP2_ARBOL_AVL_H

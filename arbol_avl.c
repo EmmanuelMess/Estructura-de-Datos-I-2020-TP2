@@ -77,8 +77,7 @@ void rotacion_simple_izquierda(
   nuevoHijo->derecha = nuevoNietoDerecha;
   nuevoNietoDerecha->izquierda = nuevoIzquierdaNietoDerecha;
 
-  nuevoHijo->factorDeEquilibrio++;
-  nuevoNietoDerecha->factorDeEquilibrio += 2;
+  nuevoNietoDerecha->alto -= 2;
 
   actualizar_max_nodo(nuevoNietoDerecha);
   actualizar_max_nodo(nuevoHijo);
@@ -96,8 +95,7 @@ void rotacion_simple_derecha(
   nuevoHijo->izquierda = nuevoNietoIzquierda;
   nuevoNietoIzquierda->derecha = nuevaDerechaNietoIzquierda;
 
-  nuevoHijo->factorDeEquilibrio--;
-  nuevoNietoIzquierda->factorDeEquilibrio -= 2;
+  nuevoNietoIzquierda->alto -= 2;
 
   actualizar_max_nodo(nuevoNietoIzquierda);
   actualizar_max_nodo(nuevoHijo);
@@ -107,6 +105,7 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
   struct ArbolAvlNode* nodo = calloc(1, sizeof(struct ArbolAvlNode));
   nodo->rango = rango;
   nodo->maxB = rango.b;
+  nodo->alto = 1;
 
   struct Deque* dequeCamino = deque_crear();
   struct Deque* dequeDireccion = deque_crear();
@@ -141,13 +140,18 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
 
     actualizar_max_nodo(chequear);
 
-    if(pos == IZQUIERDA) {
-      chequear->factorDeEquilibrio--;
+    if(chequear->izquierda && chequear->derecha) {
+      chequear->alto = max(chequear->izquierda->alto, chequear->derecha->alto) + 1;
+    } else if(chequear->izquierda) {
+      chequear->alto = chequear->izquierda->alto + 1;
+    } else if(chequear->derecha) {
+      chequear->alto = chequear->derecha->alto + 1;
     } else {
-      chequear->factorDeEquilibrio++;
+      chequear->alto = 1;
     }
 
-    if(-1 <= chequear->factorDeEquilibrio && chequear->factorDeEquilibrio <= 1) {
+    if(-1 <= itree_factor_de_equilibrio(chequear)
+        && itree_factor_de_equilibrio(chequear) <= 1) {
       continue;
     }
 
@@ -166,17 +170,17 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
       posicionDelNodo = &(arbol->arbolAvlNode);
     }
 
-    if (chequear->izquierda->factorDeEquilibrio < 0) {
+    if (itree_factor_de_equilibrio(chequear->izquierda) < 0) {
       rotacion_simple_izquierda(posicionDelNodo, chequear);
       break;
-    } else if (chequear->derecha->factorDeEquilibrio > 0) {
+    } else if (itree_factor_de_equilibrio(chequear->derecha) > 0) {
       rotacion_simple_derecha(posicionDelNodo, chequear);
       break;
-    } else if(chequear->izquierda->factorDeEquilibrio > 0) {
+    } else if(itree_factor_de_equilibrio(chequear->izquierda) > 0) {
       rotacion_simple_derecha(&(chequear->izquierda), chequear->izquierda);
       rotacion_simple_izquierda(posicionDelNodo, chequear);
       break;
-    } else if(chequear->derecha->factorDeEquilibrio < 0) {
+    } else if(itree_factor_de_equilibrio(chequear->derecha) < 0) {
       rotacion_simple_izquierda(&(chequear->derecha), chequear->derecha);
       rotacion_simple_derecha(posicionDelNodo, chequear);
       break;
@@ -217,11 +221,11 @@ void itree_imprimir_arbol(struct ArbolAvl *arbol) {
       deque_push_front(deque, NULL);
     } else {
       printf(
-        " {m: %.1lf, r: [%.2lf, %.2lf], f: %d}",
+        " {m: %.1lf, r: [%.2lf, %.2lf], a: %d}",
         nodo->maxB,
         nodo->rango.a,
         nodo->rango.b,
-        nodo->factorDeEquilibrio
+        nodo->alto
         );
       nodosEnDeque--;
 
@@ -259,4 +263,16 @@ void itree_recorrer_dfs(struct ArbolAvl *arbol, Impresion impresion) {
 
 void itree_recorrer_bfs(struct ArbolAvl *arbol, Impresion impresion) {
   itree_recorrer_fs_imprimir(arbol, impresion, deque_pop_back);
+}
+
+int itree_factor_de_equilibrio(struct ArbolAvlNode *nodo) {
+  if(nodo->derecha && nodo->izquierda) {
+    return nodo->derecha->alto - nodo->izquierda->alto;
+  } else if(nodo->derecha) {
+    return nodo->derecha->alto;
+  } else if(nodo->izquierda) {
+    return -nodo->izquierda->alto;
+  } else {
+    return 0;
+  }
 }
