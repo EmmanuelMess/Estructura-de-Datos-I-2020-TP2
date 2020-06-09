@@ -101,42 +101,13 @@ void rotacion_simple_derecha(
   actualizar_max_nodo(nuevoHijo);
 }
 
-bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
-  struct ArbolAvlNode* nodo = calloc(1, sizeof(struct ArbolAvlNode));
-  nodo->rango = rango;
-  nodo->maxB = rango.b;
-  nodo->alto = 1;
-
-  struct Deque* dequeCamino = deque_crear();
-  struct Deque* dequeDireccion = deque_crear();
-
-  {
-    struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
-    while (*pos != NULL) {
-      struct ArbolAvlNode *chequear = *pos;
-
-      if (rango.a < chequear->rango.a
-          || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
-        pos = &((*pos)->izquierda);
-        deque_push_front(dequeDireccion, &IZQUIERDA);
-      } else if (chequear->rango.a < rango.a
-                 || (chequear->rango.a == rango.a &&
-                     chequear->rango.b < rango.b)) {
-        pos = &((*pos)->derecha);
-        deque_push_front(dequeDireccion, &DERECHA);
-      } else {
-        return false;
-      }
-
-      deque_push_front(dequeCamino, chequear);
-    }
-
-    *pos = nodo;
-  }
-
+void rebalancear(
+  struct Deque* dequeCamino,
+  struct Deque* dequeDireccion
+) {
   while (!deque_vacio(dequeCamino)) {
     struct ArbolAvlNode* chequear = deque_pop_front(dequeCamino);
-    int pos = *((int*) deque_pop_front(dequeDireccion));
+    struct ArbolAvlNode** posicionDelNodo = (struct ArbolAvlNode**) deque_pop_front(dequeDireccion);
 
     actualizar_max_nodo(chequear);
 
@@ -151,23 +122,8 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
     }
 
     if(-1 <= itree_factor_de_equilibrio(chequear)
-        && itree_factor_de_equilibrio(chequear) <= 1) {
+       && itree_factor_de_equilibrio(chequear) <= 1) {
       continue;
-    }
-
-    struct ArbolAvlNode **posicionDelNodo;
-
-    if (!deque_vacio(dequeDireccion)) {
-      struct ArbolAvlNode *padre = deque_pop_front(dequeCamino);
-      deque_push_front(dequeCamino, padre);
-
-      if (pos == IZQUIERDA) {
-        posicionDelNodo = &(padre->izquierda);
-      } else {
-        posicionDelNodo = &(padre->derecha);
-      }
-    } else {
-      posicionDelNodo = &(arbol->arbolAvlNode);
     }
 
     if (itree_factor_de_equilibrio(chequear->izquierda) < 0) {
@@ -191,6 +147,45 @@ bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
     struct ArbolAvlNode *chequear = deque_pop_front(dequeCamino);
     actualizar_max_nodo(chequear);
   }
+}
+
+bool itree_insertar(struct ArbolAvl *arbol, struct Rango rango) {
+  struct ArbolAvlNode* nodo = calloc(1, sizeof(struct ArbolAvlNode));
+  nodo->rango = rango;
+  nodo->maxB = rango.b;
+  nodo->alto = 1;
+
+  struct Deque* dequeCamino = deque_crear();
+  struct Deque* dequeDireccion = deque_crear();
+
+  {
+    struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
+
+    while (*pos != NULL) {
+      deque_push_front(dequeCamino, *pos);
+      deque_push_front(dequeDireccion, pos);
+
+      struct ArbolAvlNode *chequear = *pos;
+
+      if (rango.a < chequear->rango.a
+          || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
+        pos = &((*pos)->izquierda);
+      } else if (chequear->rango.a < rango.a
+                 || (chequear->rango.a == rango.a &&
+                     chequear->rango.b < rango.b)) {
+        pos = &((*pos)->derecha);
+      } else {
+        deque_destruir(dequeCamino);
+        deque_destruir(dequeDireccion);
+
+        return false;
+      }
+    }
+
+    *pos = nodo;
+  }
+
+  rebalancear(dequeCamino, dequeDireccion);
 
   deque_destruir(dequeCamino);
   deque_destruir(dequeDireccion);
@@ -237,25 +232,26 @@ struct ArbolAvlNode** obenerPosicionDeque(
 }
 
 bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
-  struct Deque* dequeCamino = deque_crear();
-  struct Deque* dequeDireccion = deque_crear();
+  struct Deque *dequeCamino = deque_crear();
+  struct Deque *dequeDireccion = deque_crear();
 
   struct ArbolAvlNode **posicionDelNodoAEliminar;
 
-    {
+  {
     struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
     while (*pos != NULL) {
-      struct ArbolAvlNode* chequear = *pos;
+      struct ArbolAvlNode *chequear = *pos;
 
       if (rango.a < chequear->rango.a
           || (chequear->rango.a == rango.a && rango.b < chequear->rango.b)) {
         pos = &((*pos)->izquierda);
         deque_push_front(dequeDireccion, &IZQUIERDA);
       } else if (chequear->rango.a < rango.a
-                 || (chequear->rango.a == rango.a && chequear->rango.b < rango.b)) {
+                 || (chequear->rango.a == rango.a &&
+                     chequear->rango.b < rango.b)) {
         pos = &((*pos)->derecha);
         deque_push_front(dequeDireccion, &DERECHA);
-      } else if(rango.a == (*pos)->rango.a && rango.b == (*pos)->rango.b) {
+      } else if (rango.a == (*pos)->rango.a && rango.b == (*pos)->rango.b) {
         *pos = NULL;
         posicionDelNodoAEliminar = pos;
       } else {
@@ -270,7 +266,7 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
     struct ArbolAvlNode *nodoAEliminar = deque_pop_front(dequeCamino);
 
     if (nodoAEliminar->izquierda != NULL && nodoAEliminar->derecha != NULL) {
-      struct Deque* dequeCaminoTemporal = deque_crear();
+      struct Deque *dequeCaminoTemporal = deque_crear();
 
       struct ArbolAvlNode **posicionDelNodoSacado;
 
@@ -282,7 +278,7 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
       deque_push_front(dequeCaminoTemporal, nuevoHijo);
       deque_push_front(dequeDireccion, &DERECHA);
 
-      while(nuevoHijo->izquierda != NULL) {
+      while (nuevoHijo->izquierda != NULL) {
         nuevoHijo = nuevoHijo->izquierda;
         posicionDelNodoSacado = &(nodoAEliminar->derecha);
 
@@ -300,7 +296,7 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
       *posicionDelNodoAEliminar = nuevoHijo;
       deque_push_front(dequeCamino, nuevoHijo);
 
-      while(!deque_vacio(dequeCaminoTemporal)) {
+      while (!deque_vacio(dequeCaminoTemporal)) {
         deque_push_front(dequeCamino, deque_pop_back(dequeCaminoTemporal));
       }
 
@@ -326,27 +322,33 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
   }
 
   while (!deque_vacio(dequeCamino)) {
-    struct ArbolAvlNode* chequear = deque_pop_front(dequeCamino);
+    struct ArbolAvlNode *chequear = deque_pop_front(dequeCamino);
 
     actualizar_max_nodo(chequear);
 
-    if(chequear->izquierda && chequear->derecha) {
-      chequear->alto = max(chequear->izquierda->alto, chequear->derecha->alto) + 1;
-    } else if(chequear->izquierda) {
+    if (chequear->izquierda && chequear->derecha) {
+      chequear->alto =
+        max(chequear->izquierda->alto, chequear->derecha->alto) + 1;
+    } else if (chequear->izquierda) {
       chequear->alto = chequear->izquierda->alto + 1;
-    } else if(chequear->derecha) {
+    } else if (chequear->derecha) {
       chequear->alto = chequear->derecha->alto + 1;
     } else {
       chequear->alto = 1;
     }
 
-    if(-1 <= itree_factor_de_equilibrio(chequear)
-       && itree_factor_de_equilibrio(chequear) <= 1) {
+    if (-1 <= itree_factor_de_equilibrio(chequear)
+        && itree_factor_de_equilibrio(chequear) <= 1) {
       continue;
     }
 
-    struct ArbolAvlNode **posicionDelNodo = obenerPosicionDeque(dequeCamino, dequeDireccion, arbol);
-    if(!deque_vacio(dequeDireccion)) {
+    struct ArbolAvlNode **posicionDelNodo = obenerPosicionDeque(
+      dequeCamino,
+      dequeDireccion,
+      arbol
+    );
+
+    if (!deque_vacio(dequeDireccion)) {
       deque_pop_front(dequeDireccion);
     }
 
@@ -356,11 +358,11 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
     } else if (itree_factor_de_equilibrio(chequear->derecha) > 0) {
       rotacion_simple_derecha(posicionDelNodo, chequear);
       break;
-    } else if(itree_factor_de_equilibrio(chequear->izquierda) > 0) {
+    } else if (itree_factor_de_equilibrio(chequear->izquierda) > 0) {
       rotacion_simple_derecha(&(chequear->izquierda), chequear->izquierda);
       rotacion_simple_izquierda(posicionDelNodo, chequear);
       break;
-    } else if(itree_factor_de_equilibrio(chequear->derecha) < 0) {
+    } else if (itree_factor_de_equilibrio(chequear->derecha) < 0) {
       rotacion_simple_izquierda(&(chequear->derecha), chequear->derecha);
       rotacion_simple_derecha(posicionDelNodo, chequear);
       break;
