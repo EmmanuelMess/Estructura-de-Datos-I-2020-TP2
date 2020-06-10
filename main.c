@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <stdlib.h>
 #include "tests.h"
 #include "main.h"
@@ -123,7 +124,7 @@ bool procesar(char *entrada, struct ArbolAvl *arbol) {
     }
       break;
     case 'b':
-      if (*entrada != 'f' || *(entrada + 1) != 's') {
+      if (strcmp(entrada, "fs\n") != 0) {
         printf(PARSE_ERROR);
         return false;
       }
@@ -133,7 +134,7 @@ bool procesar(char *entrada, struct ArbolAvl *arbol) {
       printf("\n");
       break;
     case 'd':
-      if (*entrada != 'f' || *(entrada + 1) != 's') {
+      if (strcmp(entrada, "fs\n") != 0) {
         printf(PARSE_ERROR);
         return false;
       }
@@ -143,6 +144,11 @@ bool procesar(char *entrada, struct ArbolAvl *arbol) {
       printf("\n");
       break;
     case 's':
+      if(strcmp(entrada, "alir\n") != 0) {
+        printf(PARSE_ERROR);
+        return false;
+      }
+
       return true;
     default:
       printf(PARSE_ERROR);
