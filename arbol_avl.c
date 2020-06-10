@@ -200,11 +200,12 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
   struct ArbolAvlNode **posicionDelNodoAEliminar;
   struct ArbolAvlNode *nodoAEliminar;
 
-  {
+  {//Rastreo del nodo a eliminar
     struct ArbolAvlNode **pos = &(arbol->arbolAvlNode);
-    deque_push_front(dequeDireccion, pos);
 
     while (*pos != NULL) {
+      deque_push_front(dequeDireccion, pos);
+
       struct ArbolAvlNode *chequear = *pos;
 
       if (rango.a < chequear->rango.a
@@ -222,12 +223,10 @@ bool itree_eliminar(struct ArbolAvl *arbol, struct Rango rango) {
         deque_destruir(dequeDireccion);
         return false;
       }
-
-      deque_push_front(dequeDireccion, pos);
     }
   }
 
-  {
+  {//Rastreo del nodo que lo reemplaza
     if (nodoAEliminar->izquierda != NULL && nodoAEliminar->derecha != NULL) {
       struct ArbolAvlNode **posicionDelNodoSacado;
       struct ArbolAvlNode *nuevoHijo;
